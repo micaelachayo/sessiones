@@ -1,4 +1,6 @@
 const inputNombre=document.getElementById("name")
+const inputApellido= document.getElementById("lastName")
+const inputaAge= document.getElementById("age")
 const inputEmail=document.getElementById("email")
 const inputPassword=document.getElementById("password")
 const btnSubmit=document.getElementById("registro")
@@ -6,20 +8,24 @@ const btnSubmit=document.getElementById("registro")
 btnSubmit.addEventListener("click", async(e)=>{
     e.preventDefault()
     let nombre=inputNombre.value.trim()
+    let apellido=inputApellido.value.trim()
+    let age=inputaAge.value.trim()
     let email=inputEmail.value.trim()
     let password=inputPassword.value.trim()
   
 
-    if(!nombre || !email || !password){
+    if(!nombre ||!apellido || !age|| !email || !password){
         alert("Por favor, complete todos los datos")
         return 
     }
 
-    let body=JSON.stringify({
-        nombre, 
+    let body = JSON.stringify({
+        first_name: nombre, 
+        last_name: apellido,
+        age,
         email, 
         password
-    })
+    });
 
     let respuesta= await fetch("/api/session/registro", {
         method:"post",

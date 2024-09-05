@@ -1,7 +1,13 @@
-export const auth=(req,res,next)=>{
-if(!req.session.usuario){
-    res.setHeader('Content-Type','application/json');
-    return res.status(401).json({error:`No se identificó. Por favor identifiquese o registrese!`})
-}
-next()
-}
+export const isAuthenticated = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect("/login");
+};
+
+export const isGuest = (req, res, next) => {
+  if (!req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect("/current");
+};

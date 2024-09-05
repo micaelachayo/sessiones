@@ -1,11 +1,12 @@
 import { Router } from "express";
-
+import jwt from "jsonwebtoken";
 import passport from "passport";
+import { generaJWT, passportCall } from "../utils.js";
 
 const router = Router();
 router.post(
   "/registro",
-  passport.authenticate("registro", { failureRedirect: "/api/session/error" }),
+  passport.authenticate("registro", { failureRedirect: "/api/session/error", session:false }),
   async (req, res) => {
     let newUser = req.user;
     res.setHeader("Content-Type", "application/json");
@@ -15,21 +16,17 @@ router.post(
 
 router.get("/logout", (req, res) => {
 
-    let {web}=req.query
+  res.clearCookie("cookieMica", { httpOnly: true });
 
-    req.session.destroy(error=>{
-        if(error){
-            res.setHeader('Content-Type','application/json');
-            return res.status(500).json({error:`Error en logout`})
-        }
+  let { web } = req.query;
 
-        if(web){
-            return res.redirect("/login?mensaje=Logout exitoso...!!!")
-        }
+  if (web) {
+    // Redirigir a la página de login con un mensaje de éxito
+    return res.redirect("/login?mensaje=Logout exitoso...!!!");
+  }
         res.setHeader('Content-Type','application/json');
         return res.status(200).json({payload:"Logout exitoso"});
     })
-})
 
 // router.post("/login", async (req, res) => {
 //   try {
@@ -58,13 +55,14 @@ router.get("/callback",passport.authenticate("github",{failureRedirect:"/api/ses
 })
 router.post(
   "/login",
-  passport.authenticate("login", { failureRedirect: "/api/session/error" }),
+  passport.authenticate("login", {session:false}),
   async (req, res) => {
-    req.session.usuario = req.user;
+    let token= generaJWT(req.user)
+    res.cookie ("cookieMica",  token)
     res.setHeader("Content-Type", "application/json");
     return res
       .status(200)
-      .json({ payload: "login exitoso", logUsuario: req.user });
+      .json({ payload: "login exitoso", logUsuario: req.user,});
   }
 );
 router.get("/error", (req, res) => {
@@ -73,6 +71,24 @@ router.get("/error", (req, res) => {
     error: `Error al autenticar con passport`,
   });
 });
+router.get('*', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  return res.status(404).json({
+    error: `page not found | 404`,
+    detalle: `${error.message}` // Error aquí, `error` no está definido
+  });
+});
+router.get(
+  "/current",
+  passportCall("current"),
+  (req, res) => {
+    if (!req.user) {
+      return res.status(401).json({ error: "No autorizado" });
+    }
+    res.setHeader("Content-Type", "application/json");
+    res.status(200).json({ usuario: req.user });
+  }
+);
 // router.post("/registro", async (req, res) => {
 //   try {
 //     //Esto, por mas que yp ya lo haya hecho en el front, lo hago aca, para que el back

@@ -1,5 +1,6 @@
 import { Router } from 'express';
-import { auth } from '../middleware/auth.js';
+
+import { passportCall } from '../utils.js';
 export const router=Router()
 
 router.get('/login', (req,res)=>{
@@ -28,7 +29,7 @@ res
 router.get("/",(req,res)=>{
   try {
   
-     res.status(200).render("home",{usuario: req.session.usuario});
+     res.status(200).render("home");
   } catch (error) {
     console.log(error);
     res.setHeader('Content-Type','application/json');
@@ -42,9 +43,9 @@ router.get("/",(req,res)=>{
   }
 })
 
-router.get('/perfil', auth, (req,res)=>{
-
-  res.status(200).render('perfil',{
-      usuario: req.session.usuario, isLogin:req.session.usuario
-  })
-})
+router.get('/perfil', passportCall("current"), (req, res) => {
+  if (!req.user) {
+    return res.status(401).render('login', { mensaje: 'No autorizado' });
+  }
+  res.status(200).render('perfil', { usuario: req.user });
+});
