@@ -27,4 +27,15 @@ export const getProduct=async(req,res)=>{
     } catch (error) {
         
     }
+
+}
+export const deleteProduct=async(req,res)=>{
+    try {
+        const {id}=req.params
+        let product=await productsService.deleteProduct(id)
+        res.setHeader('Content-Type','application/json');
+        return res.status(200).json({messasge:'Producto Elminado'});
+    } catch (error) {
+        
+    }
 }

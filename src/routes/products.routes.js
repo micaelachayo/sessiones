@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   createProduct,
+  deleteProduct,
   getProduct,
 } from "../controller/products.controller.js";
 import { checkProductData } from "../middleware/checkProductData.js";
@@ -18,3 +19,9 @@ router.post(
 );
 
 router.get("/products", getProduct);
+router.delete(
+  "/:id",
+  passportCall("current"), // Asegura que el usuario esté autenticado
+  verificarRol(["admin"]),
+  deleteProduct
+);

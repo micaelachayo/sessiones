@@ -6,7 +6,7 @@ class ProductsService {
     }
 
     async getProducts() {
-        return await this.dao.find();
+        return await this.dao.get();
         
     }
 
@@ -25,6 +25,9 @@ class ProductsService {
     }
     async updateProduct(id, product){
         return await this.dao.update({_id:id}, product);
+    }
+    async deleteProduct(id){
+        return await this.dao.delete({_id:id})
     }
 }
 
