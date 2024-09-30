@@ -7,7 +7,9 @@ export const hashing= password=>bcrypt.hashSync(password,bcrypt.genSaltSync(10))
 //es para comparar la contrasena que escribí con el hash y ver que sean correctaas
 export const validarPasword=(pass,hash)=>bcrypt.compareSync(pass,hash);
 
-export const generaJWT= usuario=>jwt.sign(usuario, config.SECRET,{expiresIn:1800})
+export const generaJWT = (usuario) => {
+    return jwt.sign({ email: usuario.email, id: usuario._id }, config.SECRET, { expiresIn: '1h' });
+  };
 export const varifyToken=token=>jwt.verify(token, config.SECRET)
 
 export const passportCall = (estrategia) => function (req, res, next) {
@@ -24,4 +26,15 @@ export const passportCall = (estrategia) => function (req, res, next) {
         req.user=user
         return next()
     })(req, res, next);
+}
+
+export const error500= (res,error)=>{
+console.log(error)
+res.setHeader('Content-Type','application/json');
+return res.status(500).json(
+    {
+        error:`Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`,
+        detalle:`${error.message}`
+    }
+)
 }

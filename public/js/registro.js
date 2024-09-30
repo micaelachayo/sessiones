@@ -1,3 +1,5 @@
+
+
 const inputNombre=document.getElementById("name")
 const inputApellido= document.getElementById("lastName")
 const inputaAge= document.getElementById("age")
@@ -12,12 +14,12 @@ btnSubmit.addEventListener("click", async(e)=>{
     let age=inputaAge.value.trim()
     let email=inputEmail.value.trim()
     let password=inputPassword.value.trim()
-  
-
+ 
     if(!nombre ||!apellido || !age|| !email || !password){
         alert("Por favor, complete todos los datos")
         return 
     }
+
 
     let body = JSON.stringify({
         first_name: nombre, 

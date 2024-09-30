@@ -32,12 +32,13 @@ btn.addEventListener("click", async (e)=>{
         headers:{
             "Content-Type":"application/json"
         },
-        body
+        body,
+        credentials: 'include'
     })
 
     let datos= await respuesta.json()
    if(respuesta.status===200){
-        location.href=`/perfil`
+        location.href=`/current`
     }else{
         alert(datos.error)
     }

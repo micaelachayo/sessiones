@@ -2,13 +2,16 @@ import passport from "passport";
 import local from "passport-local";
 import github from "passport-github2";
 import passportJWT from "passport-jwt";
-import usuarioDao from "../dao/managers/usuario.dao.js";
 import { hashing, validarPasword } from "../utils.js";
 import { config } from "./config.js";
+import { UsuarioDao } from "../dao/Usuario.dao.js";
+import { usuarioService } from "../service/Usuarios.service.js";
+import { cartService } from "../service/Cart.services.js";
+
 
 const searchToken = (req) => {
   let token = null;
-  if (req.cookies.cookieMica) {
+  if (req.cookies && req.cookies.cookieMica) {
     token = req.cookies.cookieMica;
   }
   return token;
@@ -26,17 +29,22 @@ export const initPassport = () => {
             console.log("completa los datos");
             return done(null, false);
           }
-          let existe = await usuarioDao.existeUsuario({ email: username });
+          let existe = await usuarioService.getUserByEmail(username);
           if (existe) {
-            console.log("usruario repetido, ya existe");
+            console.log("El usuario ya existe");
             return done(null, false);
           }
-          let newUser = await usuarioDao.createUsuario({
+            // Asignar rol de administrador si el correo coincide
+            let role = (username === 'adminCoder@coder.com') ? 'admin' : 'user';
+            let newCart= await cartService.createCart()
+          let newUser = await usuarioService.create({
             first_name,
             last_name,
             age,
+            cart:newCart._id,
             email: username,
             password: hashing(password),
+            role
           });
           return done(null, newUser);
         } catch (error) {
@@ -52,13 +60,13 @@ export const initPassport = () => {
       { usernameField: "email" },
       async (username, password, done) => {
         try {
-          let usuario = await usuarioDao.existeUsuario({ email: username });
+          let usuario = await usuarioService.getUserByEmail(username);
           if (!usuario || !usuario.password) {
-            console.log("no existe ese usuario o la contraseña es invalidaß");
+            console.log("No existe el usuario o la contraseña es inválida.");
             return done(null, false);
           }
           if (!validarPasword(password, usuario.password)) {
-            console.log("credenciales incorrectas");
+            console.log("Las credenciales incorrectas");
             return done(null, false);
           }
           delete usuario.password;
@@ -84,15 +92,15 @@ export const initPassport = () => {
           let email =
             profile.emails && profile.emails[0] && profile.emails[0].value;
           let { name } = profile._json;
-          if (!email) {
+          if (!email) { 
             console.log("falta email");
             return done(null, false);
           }
-          let usuario = await usuarioDao.existeUsuario({ email });
+          let usuario = await usuarioService.getUserByEmail(email);
           if (!usuario) {
             console.log("no existe usuario");
-            usuario = await usuarioDao.createUsuario({
-              nombre: name,
+            usuario = await usuarioService.create({
+              first_name: name,
               email,
               profile,
             });
@@ -116,9 +124,9 @@ export const initPassport = () => {
       },
       async (contenidoToken, done) => {
         try {
-          const usuario=await usuarioDao.existeUsuario(contenidoToken.id)
+          const usuario=await usuarioService.getUserById(contenidoToken.id)
           if(!usuario){
-            return done (null,fals)
+            return done (null,false)
           }
           return done(null, usuario);
         } catch (error) {
@@ -127,10 +135,14 @@ export const initPassport = () => {
       }
     )
   );
+
   passport.serializeUser(function (user, done) {
-    return done(null, user);
-  });
-  passport.deserializeUser(async function (usuario, done) {
-    return done(null, usuario);
-  });
+    return done(null, user._id);
+})
+
+passport.deserializeUser(async function(id, done) {
+    let usuario=await usuarioService.getUserByEmail(id)
+    return done(null, usuario)
+})
+
 };

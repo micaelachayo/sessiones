@@ -9,8 +9,10 @@ import sessions from "express-session";
 import { initPassport } from "./config/passport.config.js";
 import passport from "passport";
 import { config } from "./config/config.js";
+import {router as products}from "./routes/products.routes.js"
+import { router as cartRouter } from "./routes/cart.router.js";
 
-const PORT = 3000;
+
 
 const app = express();
 app.use(cookieParser())
@@ -25,6 +27,7 @@ app.use(express.static("public"));
 // }) })
 // );
 
+
 initPassport()
 app.use(passport.initialize())
 // app.use(passport.session())
@@ -33,10 +36,12 @@ app.engine("handlebars", handlebars.engine());
 app.set("view engine", "handlebars");
 app.set("views", __dirname + "/views");
 
-app.use("/",vista);
+app.use("/api/carts", cartRouter)
+app.use("/api/products", products)
 app.use("/api/session",register);
-const server = app.listen(PORT, () => {
-  console.log(`Server escuchando en puerto ${PORT}`);
+app.use("/",vista);
+const server = app.listen(config.PORT, () => {
+  console.log(`Server escuchando en puerto ${config.PORT}`);
 });
 
 conectMongoDB();

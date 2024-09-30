@@ -1,8 +1,18 @@
-  <h2>User Profile</h2>
-    <p><strong>Name:</strong> {{usuario.nombre}}</p>
+{{>menu}}
+  <h2>Bienvenido</h2>
+    <p><strong>Name:</strong> {{usuario.first_name}}</p>
+     <p><strong>Apellido:</strong> {{usuario.last_name}}</p>
     <p><strong>Email:</strong> {{usuario.email}}</p>
-    <!-- Aquí se puede agregar más información no sensible del usuario -->
-
-    <form action="/api/session/logout" method="GET">
-        <button type="submit">Logout</button>
-    </form>
+  <ul>
+  {{#each products}}
+      <li>
+        <h2>{{this.title}}</h2>
+        <p>{{this.description}}</p>
+        <p>Precio: {{this.price}}</p>
+        <p>Stock: {{this.stock}}</p>
+        <p>Categoría: {{this.category}}</p>
+        <img src="{{this.thumbnail}}" alt="Imagen del producto">
+      </li>
+ 
+    {{/each}}
+    </ul>
