@@ -2,7 +2,7 @@ import { usuarioModelo } from "./models/usuario.models.js";
 
 export class UsuarioDao{
   static async getUsuario(){
-    return await usuarioModelo.find()
+    return await usuarioModelo.find().lean()
   }
 
 static async createUsuario(id){

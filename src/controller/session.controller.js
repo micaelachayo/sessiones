@@ -8,9 +8,7 @@ export const registro = async (req, res) => {
 
 export const login = async (req, res) => {
   let token = generaJWT(req.user);
-  
   res.cookie("cookieMica", token, { httpOnly: true });
-  
   res.setHeader("Content-Type", "application/json");
   return res
     .status(200)
