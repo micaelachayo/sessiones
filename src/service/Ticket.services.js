@@ -20,7 +20,7 @@ class TicketService {
 
       if (!producto) {
         console.log(`Producto con ID ${p.product._id} no encontrado`);
-        noProcesados.push(p.product._id); // Agregar ID a productos no procesados
+        noProcesados.push(p.product._id+` (${p.product.title})`); // Agregar ID a productos no procesados
         continue; // Saltar este producto si no se encuentra
       }
 
@@ -41,7 +41,7 @@ class TicketService {
         console.log(
           `No hay suficiente stock para el producto ${producto.title}. Se necesita ${p.quantity}, pero solo hay ${producto.stock}.`
         );
-        noProcesados.push(p.product._id); // Agregar ID a productos no procesados
+        noProcesados.push(p.product._id+ ` (${p.product.title})`); // Agregar ID a productos no procesados
       }
     }
 
@@ -65,7 +65,7 @@ class TicketService {
 
     // Filtrar los productos que no se pudieron comprar
     cart.products = cart.products.filter((p) =>
-      noProcesados.includes(p.product._id)
+      noProcesados.includes(p.product._id+` (${p.product.title})`)
     ); // Mantener solo los que no se compraron
 
     // Actualizar el carrito con los productos no procesados
