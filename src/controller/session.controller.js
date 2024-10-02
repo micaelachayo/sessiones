@@ -40,6 +40,9 @@ export const current = (req, res) => {
   if (!req.user) {
     return res.status(401).json({ error: "No autorizado" });
   }
+
+  console.log(req.user)
+
   res.setHeader("Content-Type", "application/json");
   res.status(200).json({ usuario: req.user });
 };

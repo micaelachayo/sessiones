@@ -7,6 +7,8 @@ import { config } from "./config.js";
 import { UsuarioDao } from "../dao/Usuario.dao.js";
 import { usuarioService } from "../service/Usuarios.service.js";
 import { cartService } from "../service/Cart.services.js";
+import { UsuariosDTO } from "./DTO/usuariosDTO.js";
+
 
 
 const searchToken = (req) => {
@@ -61,6 +63,7 @@ export const initPassport = () => {
       async (username, password, done) => {
         try {
           let usuario = await usuarioService.getUserByEmail(username);
+
           if (!usuario || !usuario.password) {
             console.log("No existe el usuario o la contraseña es inválida.");
             return done(null, false);
@@ -69,6 +72,7 @@ export const initPassport = () => {
             console.log("Las credenciales incorrectas");
             return done(null, false);
           }
+       
           delete usuario.password;
           return done(null, usuario);
         } catch (error) {
@@ -128,7 +132,8 @@ export const initPassport = () => {
           if(!usuario){
             return done (null,false)
           }
-          return done(null, usuario);
+          const usuarioDTO = new UsuariosDTO(usuario);
+          return done(null, usuarioDTO);
         } catch (error) {
           return done(error);
         }
@@ -142,7 +147,9 @@ export const initPassport = () => {
 
 passport.deserializeUser(async function(id, done) {
     let usuario=await usuarioService.getUserByEmail(id)
-    return done(null, usuario)
+    console.log("Usuario deserializado:", usuario); // Verifica qué campos tiene el usuario
+    const usuarioDTO = new UsuariosDTO(usuario);
+    return done(null, usuarioDTO);
 })
 
 };

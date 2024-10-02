@@ -1,4 +1,5 @@
-import { UsuarioDao as DAO } from "../dao/Usuario.dao.js"
+import { UsuarioDao as DAO} from "../dao/Usuario.dao.js"
+
 
 
  class UsuarioService{
